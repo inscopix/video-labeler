@@ -1580,8 +1580,13 @@ def avi_to_tiff(vid_file, save_dir):
         key = cv2.waitKey(1)
 
     print('Writing tiff files for {}'.format(os.path.basename(vid_file)))
+    
+    #for labeling frame number
+    count = 0
+    
     for frame in frames:
         cv2.imwrite(save_dir + "frame"+str(count)+".tiff", frame)
+        count += 1
 
 
    
