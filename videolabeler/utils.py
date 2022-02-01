@@ -24,17 +24,19 @@ def LoadVideoFrames(video_file,num_frames=None):
     if num_frames is None:
         num_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    for i in tqdm(range(num_frames),desc='Loading video'):
-        # Read video capture
-        ret, frame = video.read()
-        gray=cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+    while (video.isOpened()):
+        for i in tqdm(range(num_frames), desc='Loading video'):
+            # Read video capture
+            ret, frame = video.read()
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        frames.append(gray)
+            frames.append(gray)
 
-        key = cv2.waitKey(1)
+            key = cv2.waitKey(3)
 
-    video.release()
-    
+        video.release()
+
+    print(len(frames))
     return frames
 
 #####################################################
