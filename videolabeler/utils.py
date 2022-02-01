@@ -17,6 +17,130 @@ from datetime import datetime
 #####################################################
 ####### Load Video Frames ##########################
 #####################################################
+
+#### Srikar
+def rotate_image(image, angle):
+  image_center = tuple(np.array(image.shape[1::-1]) / 2)
+  rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
+  result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=cv2.INTER_LINEAR)
+  return result
+
+def isolate_angle(frame, rotation, title):
+    cv2.namedWindow(title, cv2.WINDOW_NORMAL)
+    if rotation == None:
+        rotation = 0
+    rotated_frame = rotate_image(frame, rotation)
+    cv2.imshow(title, rotated_frame)
+    return rotated_frame
+
+
+
+#     cv2.imwrite( pathOut, rotated_frame)
+#     writer.write(rotated_frame) # save frame as JPEG file
+def stackImages(scale, imgArray):
+    rows = len(imgArray)
+    cols = len(imgArray[0])
+    rowsAvailable = isinstance(imgArray[0], list)
+    width = imgArray[0][0].shape[1]
+    height = imgArray[0][0].shape[0]
+    if rowsAvailable:
+        for x in range(0, rows):
+            for y in range(0, cols):
+                if imgArray[x][y].shape[:2] == imgArray[0][0].shape[:2]:
+                    imgArray[x][y] = cv2.resize(imgArray[x][y], (0,0), None, scale, scale)
+                else:
+                    imgArray[x][y] = cv2.resize(imgArray[x][y], imgArray[0][0].shape[1],imgArray[0][0].shape[0] , None, scale, scale)
+                if len(imgArray[x][y].shape) == 2:
+                    imgArray[x][y] = cv2.cvtColor(imgArray[x][y], cv2.COLOR_GRAY2BGR)
+        imageBlank = np.zeros((height, width, 3), np.uint8)
+        hor = [imageBlank]*rows
+        hor_con = [imageBlank]*rows
+        for x in range(0, rows):
+            hor[x] = np.hstack(imgArray[x])
+        ver = np.stack(hor)
+        return ver
+
+
+
+
+
+
+
+def mirror(location):
+    cap = cv2.VideoCapture(location)
+    fourcc = cv2.VideoWriter_fourcc('F', 'M', 'P', '4')
+
+
+    if (cap.isOpened() == False):
+        print("Error opening video stream or file")
+
+    while (cap.isOpened()):
+        # Capture frame-by-frame
+        ret, frame = cap.read()
+        if ret == True:
+            # Display the resulting frame
+            # cv2.namedWindow("rotated", cv2.WINDOW_FULLSCREEN)
+            # Create window with freedom of dimensions
+
+            #
+            imR = cv2.resize(frame, (1800, 1800))  # Resize image
+
+            # Show image
+
+            rotated_frame = rotate_image(imR, 45)
+            # cv2.imshow("rotated", rotated_frame)
+
+            #         isolate_angle(rotated_frame)
+            left = rotated_frame[0:600, 700:1300]
+            middle = rotated_frame[600:1200, 700:1300]
+            right = rotated_frame[1200:1800, 600:1200]
+            top = rotated_frame[600:1200, 0:600]
+            bottom = rotated_frame[600:1200, 1200:1800]
+
+            frame1 = isolate_angle(left, 180, "one")
+            frame2 = isolate_angle(middle, 90, "two")
+            frame3 = isolate_angle(right, 0, "third")
+            frame4 = isolate_angle(top, 90, "fourth")
+            frame5 = isolate_angle(bottom, -90, "fifth")
+
+            frame1 = cv2.resize(frame1, (0, 0), None, 0.5, 0.5)
+            frame2 = cv2.resize(frame2, (0, 0), None, 0.5, 0.5)
+            frame3 = cv2.resize(frame3, (0, 0), None, 0.5, 0.5)
+            frame4 = cv2.resize(frame4, (0, 0), None, 0.5, 0.5)
+            frame5 = cv2.resize(frame5, (0, 0), None, 0.5, 0.5)
+
+            def f(val):
+                alpha = val / 4
+                beta = (1.0 - alpha)
+                # cv2.imshow('Horizontal', dst)
+# track bar
+
+            # cv2.imshow()
+
+            # end bar
+
+            # StackedImages = stackImages(0.8, ([[frame1], [frame2]]))
+            StackedImages = np.hstack([frame1, frame2, frame3, frame4, frame5])
+
+            cv2.imshow('Horizontal', StackedImages)
+            cv2.createTrackbar("B", "Horizontal", 0, 4, f)
+            cv2.createTrackbar("G", "Horizontal", 0, 4, f)
+            cv2.createTrackbar("R", "Horizontal", 0, 4, f)
+
+            # Press Q on keyboard to  exit
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+        # Break the loop
+        else:
+            break
+
+    cap.release()
+
+    cv2.destroyAllWindows()
+
+
+##### Srikar
 def LoadVideoFrames(video_file,num_frames=None):
     video = cv2.VideoCapture(video_file)
     frames = []
