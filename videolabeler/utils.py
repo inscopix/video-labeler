@@ -1,5 +1,8 @@
 import cv2
 import numpy as np
+# from PyQt5.QtCore import QThread, Qt, pyqtSignal, pyqtSlot
+# from PyQt5.QtGui import QImage, QPixmap
+
 from tqdm.notebook import tqdm
 from tqdm import tnrange
 from skvideo.io import FFmpegWriter
@@ -19,6 +22,48 @@ from datetime import datetime
 #####################################################
 
 #### Srikar
+
+def mirror2(frame):
+    imR = cv2.resize(frame, (1800, 1800))  # Resize image
+
+            # Show image
+
+    rotated_frame = rotate_image(imR, 45)
+            # cv2.imshow("rotated", rotated_frame)
+
+            #         isolate_angle(rotated_frame)
+    left = rotated_frame[0:600, 700:1300]
+    middle = rotated_frame[600:1200, 700:1300]
+    right = rotated_frame[1200:1800, 600:1200]
+    top = rotated_frame[600:1200, 0:600]
+    bottom = rotated_frame[600:1200, 1200:1800]
+
+    frame1 = isolate_angle(left, 180, "one")
+    frame2 = isolate_angle(middle, 90, "two")
+    frame3 = isolate_angle(right, 0, "third")
+    frame4 = isolate_angle(top, 90, "fourth")
+    frame5 = isolate_angle(bottom, -90, "fifth")
+
+    frame1 = cv2.resize(frame1, (0, 0), None, 0.5, 0.5)
+    frame2 = cv2.resize(frame2, (0, 0), None, 0.5, 0.5)
+    frame3 = cv2.resize(frame3, (0, 0), None, 0.5, 0.5)
+    frame4 = cv2.resize(frame4, (0, 0), None, 0.5, 0.5)
+    frame5 = cv2.resize(frame5, (0, 0), None, 0.5, 0.5)
+
+    def f(val):
+        pass
+# track bar
+
+            # cv2.imshow()
+
+            # end bar
+
+            # StackedImages = stackImages(0.8, ([[frame1], [frame2]]))
+    StackedImages = np.hstack([frame1, frame2, frame3, frame4, frame5])
+    return StackedImages
+
+
+
 def rotate_image(image, angle):
   image_center = tuple(np.array(image.shape[1::-1]) / 2)
   rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
@@ -110,9 +155,7 @@ def mirror(location):
             frame5 = cv2.resize(frame5, (0, 0), None, 0.5, 0.5)
 
             def f(val):
-                alpha = val / 4
-                beta = (1.0 - alpha)
-                # cv2.imshow('Horizontal', dst)
+                pass
 # track bar
 
             # cv2.imshow()
@@ -420,7 +463,7 @@ def PlayAndLabelFrames(frames,label_dict = {'w':'walking','t':'turning','s':'sta
             frame_counter = setFrameCounter(frame_counter,num_frames)
             cv2.setTrackbarPos("frame","Video", frame_counter)
 
-        elif key == ord('x'): #if `x` then quit
+        elif key == ord('x'): #if `x` then qiuit
             playVideo = False
         
         elif key == ord('\b'):
