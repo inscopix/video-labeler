@@ -24,7 +24,7 @@ from datetime import datetime
 #### Srikar
 
 def mirror2(frame):
-    imR = cv2.resize(frame, (1800, 1800))  # Resize image
+    imR = cv2.resize(frame, (900, 900))  # Resize image
 
             # Show image
 
@@ -32,11 +32,17 @@ def mirror2(frame):
             # cv2.imshow("rotated", rotated_frame)
 
             #         isolate_angle(rotated_frame)
-    left = rotated_frame[0:600, 700:1300]
-    middle = rotated_frame[600:1200, 700:1300]
-    right = rotated_frame[1200:1800, 600:1200]
-    top = rotated_frame[600:1200, 0:600]
-    bottom = rotated_frame[600:1200, 1200:1800]
+    # left = rotated_frame[0:600, 700:1300]
+    # middle = rotated_frame[600:1200, 700:1300]
+    # right = rotated_frame[1200:1800, 600:1200]
+    # top = rotated_frame[600:1200, 0:600]
+    # bottom = rotated_frame[600:1200, 1200:1800]
+
+    left = rotated_frame[0:300, 300:600]
+    middle = rotated_frame[300:600, 300:600]
+    right = rotated_frame[600:900, 300:600]
+    top = rotated_frame[300:600, 0:300]
+    bottom = rotated_frame[300:600, 600:900]
 
     frame1 = isolate_angle(left, 180, "one")
     frame2 = isolate_angle(middle, 90, "two")
@@ -71,11 +77,11 @@ def rotate_image(image, angle):
   return result
 
 def isolate_angle(frame, rotation, title):
-    cv2.namedWindow(title, cv2.WINDOW_NORMAL)
+    # cv2.namedWindow(title, cv2.WINDOW_NORMAL)
     if rotation == None:
         rotation = 0
     rotated_frame = rotate_image(frame, rotation)
-    cv2.imshow(title, rotated_frame)
+    # cv2.imshow(title, rotated_frame)
     return rotated_frame
 
 
@@ -106,81 +112,43 @@ def stackImages(scale, imgArray):
         return ver
 
 
+def mirror(frame):
+    imR = cv2.resize(frame, (900, 900))  # Resize image
+
+    # Show image
+
+    rotated_frame = rotate_image(imR, 45)
+    # cv2.imshow("rotated", rotated_frame)
+
+    #         isolate_angle(rotated_frame)
+    # left = rotated_frame[0:600, 700:1300]
+    # middle = rotated_frame[600:1200, 700:1300]
+    # right = rotated_frame[1200:1800, 600:1200]
+    # top = rotated_frame[600:1200, 0:600]
+    # bottom = rotated_frame[600:1200, 1200:1800]
+
+    left = rotated_frame[0:300, 300:600]
+    right = rotated_frame[600:900, 300:600]
 
 
+    frame1 = isolate_angle(left, 180, "one")
+    frame3 = isolate_angle(right, 0, "third")
 
+    frame1 = cv2.resize(frame1, (0, 0), None, 0.5, 0.5)
+    frame3 = cv2.resize(frame3, (0, 0), None, 0.5, 0.5)
 
+    def f(val):
+        pass
 
-def mirror(location):
-    cap = cv2.VideoCapture(location)
-    fourcc = cv2.VideoWriter_fourcc('F', 'M', 'P', '4')
+    # track bar
 
+    # cv2.imshow()
 
-    if (cap.isOpened() == False):
-        print("Error opening video stream or file")
+    # end bar
 
-    while (cap.isOpened()):
-        # Capture frame-by-frame
-        ret, frame = cap.read()
-        if ret == True:
-            # Display the resulting frame
-            # cv2.namedWindow("rotated", cv2.WINDOW_FULLSCREEN)
-            # Create window with freedom of dimensions
-
-            #
-            imR = cv2.resize(frame, (1800, 1800))  # Resize image
-
-            # Show image
-
-            rotated_frame = rotate_image(imR, 45)
-            # cv2.imshow("rotated", rotated_frame)
-
-            #         isolate_angle(rotated_frame)
-            left = rotated_frame[0:600, 700:1300]
-            middle = rotated_frame[600:1200, 700:1300]
-            right = rotated_frame[1200:1800, 600:1200]
-            top = rotated_frame[600:1200, 0:600]
-            bottom = rotated_frame[600:1200, 1200:1800]
-
-            frame1 = isolate_angle(left, 180, "one")
-            frame2 = isolate_angle(middle, 90, "two")
-            frame3 = isolate_angle(right, 0, "third")
-            frame4 = isolate_angle(top, 90, "fourth")
-            frame5 = isolate_angle(bottom, -90, "fifth")
-
-            frame1 = cv2.resize(frame1, (0, 0), None, 0.5, 0.5)
-            frame2 = cv2.resize(frame2, (0, 0), None, 0.5, 0.5)
-            frame3 = cv2.resize(frame3, (0, 0), None, 0.5, 0.5)
-            frame4 = cv2.resize(frame4, (0, 0), None, 0.5, 0.5)
-            frame5 = cv2.resize(frame5, (0, 0), None, 0.5, 0.5)
-
-            def f(val):
-                pass
-# track bar
-
-            # cv2.imshow()
-
-            # end bar
-
-            # StackedImages = stackImages(0.8, ([[frame1], [frame2]]))
-            StackedImages = np.hstack([frame1, frame2, frame3, frame4, frame5])
-
-            cv2.imshow('Horizontal', StackedImages)
-            cv2.createTrackbar("B", "Horizontal", 0, 4, f)
-            cv2.createTrackbar("G", "Horizontal", 0, 4, f)
-            cv2.createTrackbar("R", "Horizontal", 0, 4, f)
-
-            # Press Q on keyboard to  exit
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-        # Break the loop
-        else:
-            break
-
-    cap.release()
-
-    cv2.destroyAllWindows()
+    # StackedImages = stackImages(0.8, ([[frame1], [frame2]]))
+    StackedImages = np.hstack([frame1, frame3])
+    return StackedImages
 
 
 ##### Srikar
